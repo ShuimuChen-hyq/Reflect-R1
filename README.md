@@ -24,9 +24,15 @@ We further introduce Stage-Decoupled GRPO (SD-GRPO), which computes advantages s
 
 **Step 1:** Prepare the running environment.
 
-Install the Python dependencies and expose the local packages:
+Create a Python 3.11 conda environment, install the verified PyTorch/CUDA stack, then install the Reflect-R1 dependencies and local packages:
 
 ```bash
+conda create -n reflect-r1 python=3.11 -y
+conda activate reflect-r1
+
+python -m pip install --upgrade pip
+pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 \
+  --index-url https://download.pytorch.org/whl/cu124
 pip install -r requirements.txt
 pip install -e clip_as_service/client
 pip install -e clip_as_service/server
@@ -34,7 +40,7 @@ pip install -e clip_as_service/server
 export PYTHONPATH=$PWD:$PWD/clip_as_service/client:$PWD/clip_as_service/server:$PYTHONPATH
 ```
 
-The launch scripts use `flash_attention_2` by default. `requirements.txt` pins a FlashAttention wheel verified with Python 3.11, PyTorch 2.6, and CUDA 12.x. If you use a different CUDA/PyTorch stack, install the matching FlashAttention wheel for that stack. For CPU-light environment checks only, you can temporarily fall back to PyTorch SDPA:
+The launch scripts use `flash_attention_2` by default. `requirements.txt` pins a FlashAttention wheel verified with Python 3.11, PyTorch 2.6, and CUDA 12.4. If you use a different CUDA/PyTorch stack, install the matching FlashAttention wheel for that stack. For CPU-light environment checks only, you can temporarily fall back to PyTorch SDPA:
 
 ```bash
 export ATTN_IMPLEMENTATION=sdpa
