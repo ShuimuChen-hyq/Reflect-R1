@@ -162,4 +162,4 @@ We thank the authors of the following projects for their contributions:
 * [trl](https://github.com/huggingface/trl)
 * [vLLM](https://github.com/vllm-project/vllm)
 * [DeepSpeed](https://github.com/microsoft/DeepSpeed)
-* [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384)
+* [TimeSearch-R](https://github.com/Time-Search/TimeSearch-R)
