@@ -1,3 +1,5 @@
+# Create a Python 3.11 environment and install torch==2.6.0+cu124 before this file:
+# pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu124
 math_verify
 setuptools<81
 deepspeed==0.14.5
