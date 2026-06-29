@@ -1,3 +1,5 @@
+import os
+
 import torch
 from clip_server.model.clip_model import CLIPModel
 from clip_server.model.pretrained_models import _VISUAL_MODEL_IMAGE_SIZE
@@ -32,7 +34,8 @@ class SigLIPModel(CLIPModel):
     
     def build_model(self, ckpt: str, device: torch.device):
         # model = AutoModel.from_pretrained(ckpt)
-        model = AutoModel.from_pretrained(ckpt, attn_implementation="flash_attention_2", torch_dtype=torch.float16)
+        attn_implementation = os.environ.get("ATTN_IMPLEMENTATION", "flash_attention_2")
+        model = AutoModel.from_pretrained(ckpt, attn_implementation=attn_implementation, torch_dtype=torch.float16)
         # model = AutoModel.from_pretrained(ckpt, torch_dtype=torch.float16)
 
         # Optimisations

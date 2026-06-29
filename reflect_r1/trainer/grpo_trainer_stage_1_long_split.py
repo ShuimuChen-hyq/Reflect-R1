@@ -481,7 +481,7 @@ class GRPOTrainer(Trainer):
         # Models
         # Trained model
         model_init_kwargs = args.model_init_kwargs or {}
-        model_init_kwargs["attn_implementation"] = "flash_attention_2"
+        model_init_kwargs["attn_implementation"] = os.environ.get("ATTN_IMPLEMENTATION", "flash_attention_2")
         model_init_kwargs["torch_dtype"] = torch.bfloat16
         if isinstance(model, str):
             model_id = model
