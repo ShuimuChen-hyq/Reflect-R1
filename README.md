@@ -34,6 +34,12 @@ pip install -e clip_as_service/server
 export PYTHONPATH=$PWD:$PWD/clip_as_service/client:$PWD/clip_as_service/server:$PYTHONPATH
 ```
 
+The launch scripts use `flash_attention_2` by default. `requirements.txt` pins a FlashAttention wheel verified with Python 3.11, PyTorch 2.6, and CUDA 12.x. If you use a different CUDA/PyTorch stack, install the matching FlashAttention wheel for that stack. For CPU-light environment checks only, you can temporarily fall back to PyTorch SDPA:
+
+```bash
+export ATTN_IMPLEMENTATION=sdpa
+```
+
 **Step 2:** Run the temporal evidence server.
 
 Download the pre-trained SigLIP model:

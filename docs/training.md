@@ -38,17 +38,20 @@ The launch scripts localize into `.cache/reflect-r1/` automatically. Localized J
 Install the Reflect-R1 dependencies, then expose the repository and local CLIP client/server packages:
 
 ```bash
+pip install -r requirements.txt
+pip install -e clip_as_service/client
+pip install -e clip_as_service/server
+
 export PYTHONPATH=$PWD:$PWD/clip_as_service/client:$PWD/clip_as_service/server:$PYTHONPATH
 ```
 
-Alternatively, install the local CLIP packages in editable mode:
+The launch scripts use `flash_attention_2` by default. `requirements.txt` pins a FlashAttention wheel verified with Python 3.11, PyTorch 2.6, and CUDA 12.x. If you use a different CUDA/PyTorch stack, install the matching FlashAttention wheel for that stack. For CPU-light local environment checks only, you can temporarily fall back to PyTorch SDPA:
 
 ```bash
-pip install -e clip_as_service/client
-pip install -e clip_as_service/server
+export ATTN_IMPLEMENTATION=sdpa
 ```
 
-Local validation for this release used an existing Python environment with PyTorch, TRL, DeepSpeed, vLLM, Transformers, and clip-client. Public users should create an equivalent environment for their machine.
+Local validation for this release used PyTorch, TRL, DeepSpeed, vLLM, Transformers, and the local CLIP client/server packages.
 
 ## Reflect-R1 Cold-Start SFT
 
