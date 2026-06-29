@@ -10,17 +10,17 @@ import torch
 import yaml
 from collections import defaultdict
 from typing import Dict
-from time_r1.utils.qwen_vl_utils import process_vision_info, fetch_video, smart_resize, replace_vision_info_with_placeholder, IMAGE_FACTOR, FRAME_FACTOR
-from time_r1.utils import rank0_print, rank_print, parse_dataset_yaml, load_jsonl, load_json
-from time_r1.prompt import get_prompt_fn
-from time_r1.utils.visualize_frames import tensor_to_pil
-from time_r1.prompt.tool_use import get_tool_use_prompt
+from reflect_r1.utils.qwen_vl_utils import process_vision_info, fetch_video, smart_resize, replace_vision_info_with_placeholder, IMAGE_FACTOR, FRAME_FACTOR
+from reflect_r1.utils import rank0_print, rank_print, parse_dataset_yaml, load_jsonl, load_json
+from reflect_r1.prompt import get_prompt_fn
+from reflect_r1.utils.visualize_frames import tensor_to_pil
+from reflect_r1.prompt.tool_use import get_tool_use_prompt
 from torchvision import io, transforms
 from torchvision.transforms import InterpolationMode
-from time_r1.utils.video_tools import video_tool_call
+from reflect_r1.utils.video_tools import video_tool_call
 import numpy as np
-from time_r1.utils.clip_service import SiglipClient
-from time_r1.utils.tafr import construct_temporal_augmented_frames
+from reflect_r1.utils.clip_service import SiglipClient
+from reflect_r1.utils.tafr import construct_temporal_augmented_frames
 
 # --- Timeout protection for video loading and SigLIP encoding ---
 VIDEO_LOAD_TIMEOUT = int(os.environ.get("VIDEO_LOAD_TIMEOUT", "120"))
@@ -374,7 +374,7 @@ if __name__ == "__main__":
     data_path = "workdir/datasets/videomme/bes_videomme_withouttitle_test.json"
     data_root = "dataset/evaluation/llava_next/videomme/data/"
     from tqdm import tqdm
-    from time_r1.prompt import get_prompt_fn
+    from reflect_r1.prompt import get_prompt_fn
     dataset = LazyVLDataset(data_path, data_root, "v6", tool_name_list=["seek_video_frames"])
     item = dataset[0]
     print(item)

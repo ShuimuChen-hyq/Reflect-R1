@@ -65,8 +65,8 @@ from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
 from copy import deepcopy
 import re
 import numpy as np
-from time_r1.prompt.tool_use import get_tool_use_prompt
-from time_r1.utils.qwen_vl_utils import replace_vision_info_with_placeholder
+from reflect_r1.prompt.tool_use import get_tool_use_prompt
+from reflect_r1.utils.qwen_vl_utils import replace_vision_info_with_placeholder
 
 
 if is_peft_available():

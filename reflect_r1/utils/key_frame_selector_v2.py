@@ -11,8 +11,8 @@ from typing import List
 from PIL import Image
 import warnings
 
-from time_r1.utils.clip_service import SiglipClient
-from time_r1.utils.utils import timer
+from reflect_r1.utils.clip_service import SiglipClient
+from reflect_r1.utils.utils import timer
 
 
 DEFAULT_THETA = float(os.environ.get("DPP_THETA", -1))  # default use relevance scores without exponential

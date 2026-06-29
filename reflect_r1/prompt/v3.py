@@ -25,7 +25,7 @@ TEMPLATE_V3 = (
     "Please provide only the single option letter (e.g.,A, B, C, D, etc.) within the <answer></answer> tages.\n"
     "The video lasts for {duration} seconds.\n"
 )
-# Reflect-R1/time_r1/eval/select_showcase.py
+# Reflect-R1/reflect_r1/eval/select_showcase.py
 
 def make_prompt(example):
     options_text = example.get('options', '')

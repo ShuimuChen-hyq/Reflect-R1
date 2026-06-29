@@ -6,7 +6,7 @@ from torch import nn
 import time
 from typing import List
 from PIL import Image
-from time_r1.utils.io import encode_base64
+from reflect_r1.utils.io import encode_base64
 import clip_client
 
 from rich.progress import Progress

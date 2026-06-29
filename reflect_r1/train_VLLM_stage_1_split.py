@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 from math_verify import parse, verify
 from trl import GRPOConfig, ModelConfig, ScriptArguments, TrlParser, get_peft_config
-from time_r1.trainer.grpo_trainer_stage_1_long_split import GRPOTrainer
+from reflect_r1.trainer.grpo_trainer_stage_1_long_split import GRPOTrainer
 from tqdm import tqdm
 import json
 import random
@@ -34,11 +34,11 @@ if os.environ.get("ENABLE_SWANLAB") == "1":
 
 
 from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
-from time_r1.dataset.lazy_dataset import LazyVLDataset
-from time_r1.environment.video_env_stage_1 import VideoInteraction
-from time_r1.utils.utils import rank0_print
-from time_r1.reward import get_reward_functions
-from time_r1.utils.qwen_vl_utils import process_vision_info
+from reflect_r1.dataset.lazy_dataset import LazyVLDataset
+from reflect_r1.environment.video_env_stage_1 import VideoInteraction
+from reflect_r1.utils.utils import rank0_print
+from reflect_r1.reward import get_reward_functions
+from reflect_r1.utils.qwen_vl_utils import process_vision_info
 
 # import debugpy
 # try:

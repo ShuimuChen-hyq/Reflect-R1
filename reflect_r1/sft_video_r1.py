@@ -54,7 +54,7 @@ from trl import (
 )
 from accelerate import Accelerator
 from transformers.integrations.deepspeed import is_deepspeed_zero3_enabled
-from time_r1.utils.qwen_vl_utils import process_vision_info
+from reflect_r1.utils.qwen_vl_utils import process_vision_info
 
 from datasets import Dataset, DatasetDict
 from copy import deepcopy

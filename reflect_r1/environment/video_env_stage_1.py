@@ -2,7 +2,7 @@ import os
 import json
 import base64
 from PIL import Image
-from time_r1.utils.video_tools import video_tool_call
+from reflect_r1.utils.video_tools import video_tool_call
 from transformers import AutoProcessor
 import re
 from copy import deepcopy
@@ -13,8 +13,8 @@ from contextlib import contextmanager
 from codetiming import Timer
 from typing import List, Any, Tuple, Dict
 from concurrent.futures import ThreadPoolExecutor
-from time_r1.utils.qwen_vl_utils import process_vision_info, replace_vision_info_with_placeholder
-from time_r1.environment.base import Environment
+from reflect_r1.utils.qwen_vl_utils import process_vision_info, replace_vision_info_with_placeholder
+from reflect_r1.environment.base import Environment
 from vllm import SamplingParams
 
 

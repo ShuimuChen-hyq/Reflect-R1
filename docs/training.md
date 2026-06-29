@@ -55,7 +55,7 @@ Local validation for this release used an existing Python environment with PyTor
 Entrypoint:
 
 ```text
-time_r1/sft_video_r1.py
+reflect_r1/sft_video_r1.py
 ```
 
 Launch:
@@ -74,7 +74,7 @@ bash scripts/open_source/train_reflect_r1_cold_start_sft.sh
 SFT is intended to run with MPI across multiple nodes and GPUs. The full cold-start SFT run was designed for 2 H200 nodes; a single machine is only suitable for local debugging. The launcher follows the original training layout:
 
 ```text
-mpirun -np $NP -> scripts/open_source/_sft_mpi_worker.sh -> time_r1/sft_video_r1.py
+mpirun -np $NP -> scripts/open_source/_sft_mpi_worker.sh -> reflect_r1/sft_video_r1.py
 ```
 
 The worker maps `OMPI_COMM_WORLD_RANK`, `OMPI_COMM_WORLD_LOCAL_RANK`, and `OMPI_COMM_WORLD_SIZE` to the PyTorch distributed variables `RANK`, `LOCAL_RANK`, and `WORLD_SIZE`.
@@ -96,7 +96,7 @@ export REPORT_TO=none
 Entrypoint:
 
 ```text
-time_r1/train_VLLM_stage_1_split.py
+reflect_r1/train_VLLM_stage_1_split.py
 ```
 
 The dataset loader uses the localized absolute `video_path` stored inside each JSON record. The `--video_folder` argument is retained for compatibility and should not be used as the source of truth for Panda paths.

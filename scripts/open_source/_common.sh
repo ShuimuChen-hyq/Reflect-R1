@@ -59,7 +59,7 @@ build_sft_python_command() {
 
   SFT_PYTHON_CMD=(
     "${PYTHON}"
-    "${ROOT_DIR}/time_r1/sft_video_r1.py"
+    "${ROOT_DIR}/reflect_r1/sft_video_r1.py"
     --output_dir "${OUTPUT_DIR}"
     --model_name_or_path "${MODEL_NAME_OR_PATH}"
     --dataset_name "${LOCAL_SFT_JSONL}"
@@ -132,7 +132,7 @@ run_grpo_entry() {
   build_torchrun_command
   local cmd=(
     "${TORCHRUN_CMD[@]}"
-    "${ROOT_DIR}/time_r1/train_VLLM_stage_1_split.py"
+    "${ROOT_DIR}/reflect_r1/train_VLLM_stage_1_split.py"
     --deepspeed "${DEEPSPEED_CONFIG:-${ROOT_DIR}/scripts/zero3_offload.json}"
     --output_dir "${OUTPUT_DIR}"
     --model_name_or_path "${MODEL_NAME_OR_PATH}"

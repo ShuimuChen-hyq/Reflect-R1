@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 import os
 import math
-# from time_r1.reward.llm_judge import llm_judge_score
+# from reflect_r1.reward.llm_judge import llm_judge_score
 import ast
 import numpy as np
 MAX_TOOL_USE_NUM=10
@@ -38,6 +38,65 @@ def slice_s3_phase(messages):
         return messages[last_user_idx + 1:]
 
     return messages
+
+def accuracy_reward_S2(S1, S2, tool_use, **kwargs):
+    # completions: 模型生成的完整响应列表
+
+    # messages: 对话消息列表
+
+    # target: 目标/参考答案列表（每个元素是包含"answer"键的字典）
+
+    # question: 问题列表
+
+    # type: 问题类型列表
+
+    # **kwargs: 额外参数
+    """
+    Calculate the llm judge reward.
+    """
+    if tool_use:
+        return [0.0] * len(S1)
+    ## IDK模式
+    idk_pattern = r"i don'?t know|unsure|not sure|insufficient|no information|cannot determine|can'?t determine|unclear"
+    messages = S2
+    reward_list = []
+    for msg, sol, q, options in zip(messages, kwargs["answer"], kwargs["question"], kwargs["options"]):
+        question = q
+        # 解析选项字符串
+        options_str = options
+        candidates = parse_options_string(options_str)
+        # 获取正确答案（字母形式，如 "A", "B", "C"）
+        correct_answer = sol
+        # 提取模型预测的文本
+        pred_text = extract_prediction_from_message(msg)
+        if pred_text is None or pred_text == "":
+            reward_list.append(0.0) ## 不能同时出现答案和工具调用，否则直接判0分
+            continue # 跳过后续处理
+
+        ### IDK 检查
+        text_clean = re.sub(r'[.!?]+$', '', pred_text.strip().lower())
+        if re.search(idk_pattern, text_clean):
+            reward_list.append(0.0)
+            continue
+        # 解析预测结果
+        all_choices = []
+        index2ans = {}
+        for i, option in enumerate(candidates):
+            index2ans[chr(ord("A") + i)] = option
+            all_choices.append(chr(ord("A") + i))
+        parsed_pred = parse_multi_choice_response(pred_text, all_choices, index2ans) ## 从文本中提取出 "A", "B" 等字母
+        if parsed_pred is None:
+            # 解析失败，给 0 分
+            reward_list.append(-1.0)
+        else:
+            # ---------------------------------------------------------
+            # 2. 准确率检查 (Accuracy)
+            # ---------------------------------------------------------
+            is_correct = (parsed_pred.strip().upper() == sol.strip().upper())
+            acc_reward = 1.0 if is_correct else -1.0
+
+            reward_list.append(acc_reward)
+    return reward_list
 
 def parse_options_string(options_str):
     """
@@ -134,6 +193,18 @@ def extract_prediction_from_message(messages):
         result = answers[-1]
     else:
         result = ""
+        # for message in messages:
+        #     if message['role'] == 'assistant':
+        #         for content in message['content']:
+        #             if content['type'] == 'text':
+        #                 text = content['text']
+        #                 for pattern in patterns:
+        #                     match = re.search(pattern, text)
+        #                     if match:
+        #                         result = match.group(1).strip()
+        #                         break
+        #                 if not result:
+        #                     result = text.strip()
 
     return result
 
@@ -262,7 +333,7 @@ def parse_multi_choice_response(response, all_choices, index2ans):
             if f"({choice}" in response:  # 匹配 "(C" 格式
                 candidates.append(choice)
 
-    # # if all above doesn't get candidates, check if the content is larger than 5 tokens and try to parse the example
+    # if all above doesn't get candidates, check if the content is larger than 5 tokens and try to parse the example
     # if len(candidates) == 0 and len(response.split()) > 5:
     #     for index, ans in index2ans.items():
     #         if ans.lower() in response.lower():
@@ -476,7 +547,9 @@ def reflect_reward(prompts, completions, completions_visual, final_msg, S1=False
         completions, completions_visual, final_msg,
         kwargs["answer"], kwargs["question"], kwargs["options"]
     )
-
+    if S2:
+        rewards = accuracy_reward_S2(S1=completions, S2=completions_visual, tool_use= False, **kwargs)
+        return rewards
     for s1, s2, s3, sol, q, options in iterator:
         # ... (解析逻辑保持不变) ...
         # 解析选项、提取文本、转换为 A/B/C/D ...
@@ -546,7 +619,7 @@ def reflect_reward(prompts, completions, completions_visual, final_msg, S1=False
                 # 但为了安全，建议不加。
             else:
                 # S3 错了
-                if s1_right :
+                if s1_right or s2_right:
                     # 败家惩罚：明明有人做对了，你却改错了。
                     # 这是一个强烈的负信号。
                     current_reward -= 1.0
@@ -555,17 +628,11 @@ def reflect_reward(prompts, completions, completions_visual, final_msg, S1=False
                     current_reward += 0.0
 
             rewards.append(current_reward)
-        elif S2:
-            # if s2_right:
-            #     current_reward += 1.0
-            # else:
-            current_reward += 0.0
-            rewards.append(current_reward)
         elif S1:
-            # if s1_right:
-            #     current_reward += 1.0
-            # else:
-            current_reward += 0.0 ## 冻结S1的准确性
+            if s1_right:
+                current_reward += 1.0
+            else:
+                current_reward += 0.0 ## 冻结S1的准确性
             rewards.append(current_reward)
     return rewards
 
@@ -765,6 +832,7 @@ def tool_call_num_reward_advance(prompts, completions, completions_visual, final
 
 
 import re
+
 def reasoning_length_score(length, min_len=120, max_len=700):
     """
     软边界长度打分 + 非对称惩罚。
@@ -845,67 +913,54 @@ def reasoning_length_reward_single(batch_messages):
     return rewards
 
 
-
+# ==================== 旧版二值长度奖励（已废弃） ====================
 # def reasoning_length_reward_single(batch_messages):
 #     """
 #     长度奖励：支持 Batch 处理，且会检查对话中【每一条】Assistant 回复的思考长度。
 #     计算方式：该样本中所有 Assistant 回复的平均得分。
 #     """
-
+#
 #     min_len = 120
 #     max_len = 700
-
+#
 #     rewards = []
-
-#     # 定义提取 think 内容的正则
+#
 #     pattern = re.compile(r'<think>(.*?)</think>', re.DOTALL)
-
-#     # 【关键修正 1】：第一层循环，遍历 Batch 中的每一个样本
+#
 #     for conversation in batch_messages:
-#         turn_scores = [] # 用来存这一段对话里，每一次回答的得分
-
-#         # 【关键修正 2】：第二层循环，遍历该对话中的每一轮消息
+#         turn_scores = []
+#
 #         for msg in conversation:
 #             if msg.get("role") == "assistant":
-#                 # 提取文本内容 (兼容 content 是字符串或多模态列表的情况)
 #                 text = ""
 #                 content = msg.get("content", "")
-
+#
 #                 if isinstance(content, str):
 #                     text = content
 #                 elif isinstance(content, list):
 #                     for item in content:
 #                         if isinstance(item, dict) and item.get("type") == "text":
 #                             text += item.get("text", "")
-
-#                 # 提取 <think>
+#
 #                 match = pattern.search(text)
 #                 if match:
 #                     think_content = match.group(1).strip()
-
-#                     # 【小建议】：中文场景建议直接用 len() 算字符数
-#                     # 如果是纯英文模型用 split() 算单词数没问题
-#                     # 这里为了保险，建议用 len(think_content)
 #                     length = len(think_content)
-
-#                     # 判断是否在区间内
+#
 #                     if min_len <= length <= max_len:
-#                         turn_scores.append(1.0) # 合格，给奖励
+#                         turn_scores.append(1.0)
 #                     else:
-#                         turn_scores.append(0.0) # 不合格，没分
+#                         turn_scores.append(0.0)
 #                 else:
-#                     # 没有 think 标签，直接 0 分
 #                     turn_scores.append(0.0)
-
-#         # 【关键修正 3】：计算该样本的最终得分
-#         # 比如有 3 次回答，2 次合格，1 次不合格，那么得分为 (0.5+0.5+0)/3 = 0.33
+#
 #         if len(turn_scores) > 0:
 #             final_score = sum(turn_scores) / len(turn_scores)
 #         else:
 #             final_score = 0.0
-
+#
 #         rewards.append(final_score)
-
+#
 #     return rewards
 
 # def reasoning_length_reward(prompts, completions, completions_visual, final_msg, S1=False, S2=False, S3=False, **kwargs):
@@ -1068,7 +1123,7 @@ reward_functions = [ ## 对于S1和S2可能还需要加入长度奖励，参考v
 ## 奖励函数
 reward_weights = [
     1.0,
-    1.0,
+    0.5,
     0.5,
     0.2,
     0.0,

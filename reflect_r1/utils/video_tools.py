@@ -3,9 +3,9 @@ import mimetypes
 from PIL import Image
 from typing import Union, Tuple, List, Dict
 from qwen_agent.tools.base import BaseTool, register_tool, TOOL_REGISTRY
-from time_r1.utils.key_frame_selector_v2 import DppTimeSelector
-from time_r1.utils.utils import rank_debug
-from time_r1.prompt import get_prompt_fn
+from reflect_r1.utils.key_frame_selector_v2 import DppTimeSelector
+from reflect_r1.utils.utils import rank_debug
+from reflect_r1.prompt import get_prompt_fn
 import numpy as np
 import torch
 import os
@@ -223,7 +223,7 @@ def video_tool_call(
 
 
 if __name__ == "__main__":
-    from time_r1.utils.qwen_vl_utils import fetch_video
+    from reflect_r1.utils.qwen_vl_utils import fetch_video
     
     frames = fetch_video({"video": "workdir/datasets/Charades/videos/0A8CF.mp4"})
     print(frames.shape)
